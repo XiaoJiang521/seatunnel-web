@@ -20,29 +20,37 @@ package org.apache.seatunnel.app.thirdparty.datasource.impl;
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
 import org.apache.seatunnel.shade.com.typesafe.config.ConfigValueFactory;
 
+import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.RequiredOption;
 import org.apache.seatunnel.app.domain.request.connector.BusinessMode;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.SelectTableFields;
 import org.apache.seatunnel.app.domain.response.datasource.VirtualTableDetailRes;
 import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.constants.PluginType;
+
+import com.google.auto.service.AutoService;
 
 import java.util.Arrays;
 import java.util.List;
 
+@AutoService(DataSourceConfigSwitcher.class)
 public class ElasticSearchDataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
-
-    public static final ElasticSearchDataSourceConfigSwitcher INSTANCE =
-            new ElasticSearchDataSourceConfigSwitcher();
 
     private static final String SOURCE = "source";
     private static final String SCHEMA = "schema";
     private static final String PRIMARY_KEYS = "primary_keys";
     private static final String INDEX = "index";
 
-    private ElasticSearchDataSourceConfigSwitcher() {}
+    public ElasticSearchDataSourceConfigSwitcher() {}
+
+    @Override
+    public String getDataSourceName() {
+        return "ELASTICSEARCH";
+    }
 
     @Override
     public FormStructure filterOptionRule(
@@ -52,6 +60,8 @@ public class ElasticSearchDataSourceConfigSwitcher extends AbstractDataSourceCon
             BusinessMode businessMode,
             PluginType pluginType,
             OptionRule connectorOptionRule,
+            List<RequiredOption> addRequiredOptions,
+            List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
         if (PluginType.SOURCE.equals(pluginType)) {
             // DELETE source/schema
@@ -72,6 +82,8 @@ public class ElasticSearchDataSourceConfigSwitcher extends AbstractDataSourceCon
                 businessMode,
                 pluginType,
                 connectorOptionRule,
+                addRequiredOptions,
+                addOptionalOptions,
                 excludedKeys);
     }
 

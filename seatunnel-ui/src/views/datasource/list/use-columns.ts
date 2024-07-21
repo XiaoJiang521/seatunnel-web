@@ -23,7 +23,6 @@ import { getTableColumn } from '@/common/table'
 
 import { useTableOperation } from '@/hooks'
 import { EditOutlined } from '@vicons/antd'
-import ResourceAuth from '@/components/resource-auth'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
@@ -81,33 +80,25 @@ export function useColumns(onCallback: Function) {
         title: t('datasource.update_time'),
         key: 'updateTime',
       },
-      {
-        title: t('data_pipes.operation'),
+      useTableOperation({
+        title: t('datasource.operation'),
         key: 'operation',
-        render: (row: any) =>
-          h(NSpace, null, {
-            default: () => [
-              h(
-                NButton,
+        buttons: [
           {
-                  text: true,
-                  onClick: () => void onCallback(row.id, 'edit')
+            text: t('datasource.edit'),
+            icon: h(EditOutlined),
+            onClick: (rowData) => void onCallback(rowData.id, 'edit')
           },
           {
-                  default: () => t('datasource.edit')
-                }
-              ),
-              h(
-                NButton,
-                {
-                  text: true,
-                  onClick: () => void onCallback(row.id, 'delete')
-          },
-                { default: () => t('datasource.delete') }
-              )
+            isDelete: true,
+            text: t('datasource.delete'),
+            onPositiveClick: (rowData) => void onCallback(rowData.id, 'delete'),
+            negativeText: t('datasource.cancel'),
+            positiveText: t('datasource.confirm'),
+            popTips: t('datasource.delete_confirm')
+          }
         ]
       })
-      }
     ]
   }
 

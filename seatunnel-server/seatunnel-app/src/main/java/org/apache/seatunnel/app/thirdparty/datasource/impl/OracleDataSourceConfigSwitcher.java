@@ -17,17 +17,18 @@
 
 package org.apache.seatunnel.app.thirdparty.datasource.impl;
 
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.utils.SeaTunnelException;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import com.google.auto.service.AutoService;
 
 import java.util.List;
+import java.util.Optional;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AutoService(DataSourceConfigSwitcher.class)
 public class OracleDataSourceConfigSwitcher extends BaseJdbcDataSourceConfigSwitcher {
-    public static final OracleDataSourceConfigSwitcher INSTANCE =
-            new OracleDataSourceConfigSwitcher();
+
+    public static final String CATALOG_NAME = "Oracle";
 
     protected String tableFieldsToSql(List<String> tableFields, String database, String fullTable) {
         String[] split = fullTable.split("\\.");
@@ -63,5 +64,18 @@ public class OracleDataSourceConfigSwitcher extends BaseJdbcDataSourceConfigSwit
                 .append(".")
                 .append(quoteIdentifier(table));
         return sb.toString();
+    }
+
+    @Override
+    public String getDataSourceName() {
+        return "JDBC-ORACLE";
+    }
+
+    protected boolean isSupportDefaultSchema() {
+        return true;
+    }
+
+    protected Optional<String> getCatalogName() {
+        return Optional.of(CATALOG_NAME);
     }
 }

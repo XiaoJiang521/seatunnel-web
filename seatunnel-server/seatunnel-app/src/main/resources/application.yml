@@ -24,27 +24,18 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/seatunnel?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&allowPublicKeyRetrieval=true
     username: root
-    password: root@123
+    password: 123456
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-ds:
-  script:
-    dir: /dj
-  project:
-    default: seatunnel_test
-  tenant:
-    default: gaojun
-  api:
-    token: 6781b46bba1039c622d602beb25e880e
-    prefix: http://localhost:12345/dolphinscheduler
 
 jwt:
   expireTime: 86400
-  secretKey: https://github.com/apache/incubator-seatunnel
+  # please add key when deploy
+  secretKey:
   algorithm: HS256
 
 ---
@@ -54,9 +45,16 @@ spring:
       on-profile: h2
   sql:
     init:
-      schema-locations: classpath:script/seatunnel_server_h2.sql
+      schema-locations: classpath*:script/seatunnel_server_h2.sql
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:seatunnel;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
     username: sa
-    password: ""
+    password: sa
+  h2:
+    console:
+      enabled: true
+      path: /h2
+      settings:
+        trace: false
+        web-allow-others: false

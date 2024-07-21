@@ -19,23 +19,31 @@ package org.apache.seatunnel.app.thirdparty.datasource.impl;
 
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
 
+import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.RequiredOption;
 import org.apache.seatunnel.app.domain.request.connector.BusinessMode;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.SelectTableFields;
 import org.apache.seatunnel.app.domain.response.datasource.VirtualTableDetailRes;
 import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.constants.PluginType;
+
+import com.google.auto.service.AutoService;
 
 import java.util.List;
 
+@AutoService(DataSourceConfigSwitcher.class)
 public class S3RedshiftDataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
 
-    private S3RedshiftDataSourceConfigSwitcher() {}
+    public S3RedshiftDataSourceConfigSwitcher() {}
 
-    private static final S3RedshiftDataSourceConfigSwitcher INSTANCE =
-            new S3RedshiftDataSourceConfigSwitcher();
+    @Override
+    public String getDataSourceName() {
+        return "S3-REDSHIFT";
+    }
 
     @Override
     public FormStructure filterOptionRule(
@@ -45,6 +53,8 @@ public class S3RedshiftDataSourceConfigSwitcher extends AbstractDataSourceConfig
             BusinessMode businessMode,
             PluginType pluginType,
             OptionRule connectorOptionRule,
+            List<RequiredOption> addRequiredOptions,
+            List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
         excludedKeys.add("access_key");
         excludedKeys.add("secret_key");
@@ -55,6 +65,8 @@ public class S3RedshiftDataSourceConfigSwitcher extends AbstractDataSourceConfig
                 businessMode,
                 pluginType,
                 connectorOptionRule,
+                addRequiredOptions,
+                addOptionalOptions,
                 excludedKeys);
     }
 
@@ -75,9 +87,5 @@ public class S3RedshiftDataSourceConfigSwitcher extends AbstractDataSourceConfig
                 businessMode,
                 pluginType,
                 connectorConfig);
-    }
-
-    public static S3RedshiftDataSourceConfigSwitcher getInstance() {
-        return INSTANCE;
     }
 }

@@ -20,13 +20,12 @@ connector-datasource-mapper:
     Jdbc:
       dataSources:
         - JDBC-Mysql
-        - JDBC-Redshift
         - JDBC-Postgres
         - JDBC-TiDB
-        - JDBC-StarRocks
         - JDBC-SQLServer
         - JDBC-KingBase
         - JDBC-Oracle
+        - JDBC-Db2
 
     MySQL-CDC:
       dataSources:
@@ -35,7 +34,6 @@ connector-datasource-mapper:
     Kafka:
       dataSources:
         - Kafka
-        - Kafka-Kingbase
 
     StarRocks:
       dataSources:
@@ -49,29 +47,20 @@ connector-datasource-mapper:
       dataSources:
         - S3
 
-    S3Redshift:
-      dataSources:
-        - S3-Redshift
-
     SqlServer-CDC:
       dataSources:
         - SqlServer-CDC
-
-    Oracle-CDC:
-      dataSources:
-        - Oracle-CDC
 
     Postgres-CDC:
       dataSources:
         - Postgres-CDC
 
+    MongoDB:
+      dataSources:
+        - MongoDB
+
   sourceDatasourceFeatures:
     JDBC-Mysql:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
-    JDBC-Redshift:
       businessMode:
         - DATA_INTEGRATION
       sceneMode:
@@ -81,26 +70,13 @@ connector-datasource-mapper:
         - DATA_INTEGRATION
       sceneMode:
         - SINGLE_TABLE
-    JDBC-TiDB:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
-    JDBC-StarRocks:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
+
     JDBC-SQLServer:
       businessMode:
         - DATA_INTEGRATION
       sceneMode:
         - SINGLE_TABLE
-    JDBC-KingBase:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
+
     JDBC-Oracle:
       businessMode:
         - DATA_INTEGRATION
@@ -142,11 +118,6 @@ connector-datasource-mapper:
       sceneMode:
         - SINGLE_TABLE
 
-    S3-Redshift:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
 
     SqlServer-CDC:
       businessMode:
@@ -157,40 +128,34 @@ connector-datasource-mapper:
         - MULTIPLE_TABLE
         - SPLIT_TABLE
 
-    Kafka-Kingbase:
+    MongoDB:
       businessMode:
         - DATA_INTEGRATION
-        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
-        - MULTIPLE_TABLE
-        - SPLIT_TABLE
-
-    Oracle-CDC:
+      jobMode:
+        - BATCH
+    JDBC-Db2:
       businessMode:
         - DATA_INTEGRATION
-        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
-        - MULTIPLE_TABLE
-        - SPLIT_TABLE
 
   sinkDatasourceFeatures:
     JDBC-Mysql:
       businessMode:
         - DATA_INTEGRATION
+        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
-    JDBC-Redshift:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
+        - MULTIPLE_TABLE
     JDBC-Postgres:
       businessMode:
         - DATA_INTEGRATION
+        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
+        - MULTIPLE_TABLE
     JDBC-TiDB:
       businessMode:
         - DATA_INTEGRATION
@@ -199,26 +164,26 @@ connector-datasource-mapper:
         - SINGLE_TABLE
         - MULTIPLE_TABLE
         - SPLIT_TABLE
-    JDBC-StarRocks:
-      businessMode:
-        - DATA_INTEGRATION
-      sceneMode:
-        - SINGLE_TABLE
     JDBC-SQLServer:
       businessMode:
         - DATA_INTEGRATION
+        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
+        - MULTIPLE_TABLE
     JDBC-KingBase:
       businessMode:
         - DATA_INTEGRATION
+        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
     JDBC-Oracle:
       businessMode:
         - DATA_INTEGRATION
+        - DATA_REPLICA
       sceneMode:
         - SINGLE_TABLE
+        - MULTIPLE_TABLE
     Kafka:
       businessMode:
         - DATA_REPLICA
@@ -248,7 +213,14 @@ connector-datasource-mapper:
       sceneMode:
         - SINGLE_TABLE
 
-    S3-Redshift:
+    MongoDB:
+      businessMode:
+        - DATA_INTEGRATION
+        - DATA_REPLICA
+      sceneMode:
+        - SINGLE_TABLE
+        - MULTIPLE_TABLE
+    JDBC-Db2:
       businessMode:
         - DATA_INTEGRATION
       sceneMode:

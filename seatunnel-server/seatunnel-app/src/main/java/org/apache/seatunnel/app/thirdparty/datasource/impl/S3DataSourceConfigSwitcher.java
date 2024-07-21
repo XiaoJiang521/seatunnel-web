@@ -20,26 +20,34 @@ package org.apache.seatunnel.app.thirdparty.datasource.impl;
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
 import org.apache.seatunnel.shade.com.typesafe.config.ConfigValueFactory;
 
+import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.RequiredOption;
 import org.apache.seatunnel.app.domain.request.connector.BusinessMode;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.SelectTableFields;
 import org.apache.seatunnel.app.domain.response.datasource.VirtualTableDetailRes;
 import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.constants.PluginType;
 import org.apache.seatunnel.datasource.plugin.s3.S3OptionRule;
 
+import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
+@AutoService(DataSourceConfigSwitcher.class)
 public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
 
-    private S3DataSourceConfigSwitcher() {}
+    public S3DataSourceConfigSwitcher() {}
 
-    private static final S3DataSourceConfigSwitcher INSTANCE = new S3DataSourceConfigSwitcher();
+    @Override
+    public String getDataSourceName() {
+        return "S3";
+    }
 
     @Override
     public FormStructure filterOptionRule(
@@ -49,6 +57,8 @@ public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher
             BusinessMode businessMode,
             PluginType pluginType,
             OptionRule connectorOptionRule,
+            List<RequiredOption> addRequiredOptions,
+            List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
         excludedKeys.add(S3OptionRule.PATH.key());
         if (PluginType.SOURCE.equals(pluginType)) {
@@ -62,6 +72,8 @@ public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher
                 businessMode,
                 pluginType,
                 connectorOptionRule,
+                addRequiredOptions,
+                addOptionalOptions,
                 excludedKeys);
     }
 
@@ -177,9 +189,5 @@ public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher
                 businessMode,
                 pluginType,
                 connectorConfig);
-    }
-
-    public static S3DataSourceConfigSwitcher getInstance() {
-        return INSTANCE;
     }
 }

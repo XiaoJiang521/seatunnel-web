@@ -508,7 +508,7 @@ public class JobTaskServiceImpl extends SeatunnelBaseServiceImpl implements IJob
                 SQLTransformOptions sqlTransformOptions =
                         getTransformOption(transform, transformOptionsStr);
                 if (sqlTransformOptions != null) {
-                    // TODO 调用接口返回目标字段
+                    // TODO The call interface returns the target field
                     List<String> fields = new ArrayList<>();
                     checkTransformTargetFieldRepeat(fields);
                 }
@@ -552,6 +552,12 @@ public class JobTaskServiceImpl extends SeatunnelBaseServiceImpl implements IJob
     public void deleteSingleTask(long jobVersionId, String pluginId) {
         funcPermissionCheck(SeatunnelFuncPermissionKeyConstant.SINGLE_TASK_DELETE, 0);
         jobTaskDao.deleteTask(jobVersionId, pluginId);
+    }
+
+    @Override
+    public void deleteTaskByVersionId(long id) {
+        funcPermissionCheck(SeatunnelFuncPermissionKeyConstant.SINGLE_TASK_DELETE, 0);
+        jobTaskDao.deleteTaskByVersionId(id);
     }
 
     private String getConnectorTypeFromDataSource(long datasourceId) {

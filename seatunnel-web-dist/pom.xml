@@ -32,62 +32,17 @@
     <properties>
         <!-- disable mvn deploy to central maven repo by default -->
         <maven.deploy.skip>true</maven.deploy.skip>
-        <!--        <frontend.project.name>seatunnel-ui</frontend.project.name>-->
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
-        <clickhouse.version>0.3.2-patch11</clickhouse.version>
         <postgresql.version>42.4.3</postgresql.version>
-        <redshift.version>2.1.0.10</redshift.version>
         <sqlserver.version>9.2.1.jre8</sqlserver.version>
         <mysql-connector.version>8.0.28</mysql-connector.version>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.11.3</version>
-                <configuration>
-                    <workingDirectory>${project.basedir}/../${frontend.project.name}</workingDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <nodeVersion>v16.16.0</nodeVersion>
-                            <npmVersion>8.19.2</npmVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <arguments>install --ignore-scripts</arguments>
-                        </configuration>
-                    </execution>
-                    <!--                    <execution>-->
-                    <!--                        <id>build</id>-->
-                    <!--                        <goals>-->
-                    <!--                            <goal>npm</goal>-->
-                    <!--                        </goals>-->
-                    <!--                        <configuration>-->
-                    <!--                            <arguments>run build:prod</arguments>-->
-                    <!--                        </configuration>-->
-                    <!--                    </execution>-->
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <profiles>
         <profile>
             <id>release</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <property>
                     <name>release</name>
                     <value>true</value>
@@ -99,13 +54,11 @@
                     <groupId>org.apache.seatunnel</groupId>
                     <artifactId>seatunnel-app</artifactId>
                     <version>${project.version}</version>
-                    <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.seatunnel</groupId>
                     <artifactId>seatunnel-datasource-client</artifactId>
                     <version>${project.version}</version>
-                    <scope>provided</scope>
                 </dependency>
             </dependencies>
 
@@ -113,10 +66,49 @@
                 <finalName>apache-seatunnel-web-${project.version}</finalName>
                 <plugins>
                     <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>1.11.3</version>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/../seatunnel-ui</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>v16.16.0</nodeVersion>
+                                    <npmVersion>8.19.2</npmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install --ignore-scripts</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build:prod</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>seatunnel-web</id>
+                                <id>bin</id>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
@@ -125,7 +117,20 @@
                                     <descriptors>
                                         <descriptor>src/main/assembly/seatunnel-web.xml</descriptor>
                                     </descriptors>
-                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>src</id>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/assembly-src.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
                             </execution>
                         </executions>
@@ -188,6 +193,18 @@
                 </dependency>
                 <dependency>
                     <groupId>org.apache.seatunnel</groupId>
+                    <artifactId>datasource-hive</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>*</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.seatunnel</groupId>
                     <artifactId>datasource-jdbc-mysql</artifactId>
                     <version>${project.version}</version>
                     <scope>provided</scope>
@@ -225,18 +242,6 @@
                 <dependency>
                     <groupId>org.apache.seatunnel</groupId>
                     <artifactId>datasource-jdbc-tidb</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>*</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.seatunnel</groupId>
-                    <artifactId>datasource-jdbc-redshift</artifactId>
                     <version>${project.version}</version>
                     <scope>provided</scope>
                     <exclusions>
@@ -298,18 +303,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.apache.seatunnel</groupId>
-                    <artifactId>datasource-s3redshift</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>*</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.seatunnel</groupId>
                     <artifactId>datasource-starrocks</artifactId>
                     <version>${project.version}</version>
                     <scope>provided</scope>
@@ -357,8 +350,33 @@
                     </exclusions>
                 </dependency>
 
-                <!-- jdbc driver -->
+                <dependency>
+                    <groupId>org.apache.seatunnel</groupId>
+                    <artifactId>datasource-mongodb</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>*</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
 
+                <dependency>
+                    <groupId>org.apache.seatunnel</groupId>
+                    <artifactId>datasource-jdbc-db2</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>*</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <!-- jdbc driver -->
                 <dependency>
                     <groupId>com.oracle.database.jdbc</groupId>
                     <artifactId>ojdbc8</artifactId>
@@ -366,15 +384,6 @@
                     <scope>provided</scope>
                 </dependency>
 
-                <!-- driver -->
-                <dependency>
-                    <groupId>com.clickhouse</groupId>
-                    <artifactId>clickhouse-jdbc</artifactId>
-                    <version>${clickhouse.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <!-- driver -->
                 <dependency>
                     <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
@@ -383,21 +392,12 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>com.amazon.redshift</groupId>
-                    <artifactId>redshift-jdbc42</artifactId>
-                    <version>${redshift.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <!-- driver -->
-                <dependency>
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>mssql-jdbc</artifactId>
                     <version>${sqlserver.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
-                <!-- driver -->
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
@@ -405,11 +405,52 @@
                     <scope>provided</scope>
                 </dependency>
 
+                <!-- driver end -->
+
             </dependencies>
 
             <build>
                 <finalName>apache-seatunnel-web-${project.version}</finalName>
                 <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>1.11.3</version>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/../seatunnel-ui</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>v16.16.0</nodeVersion>
+                                    <npmVersion>8.19.2</npmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install --ignore-scripts</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build:prod</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>

@@ -21,6 +21,7 @@ import org.apache.seatunnel.api.table.catalog.DataTypeConvertor;
 import org.apache.seatunnel.api.table.factory.DataTypeConvertorFactory;
 import org.apache.seatunnel.api.table.type.SeaTunnelDataType;
 import org.apache.seatunnel.app.bean.connector.ConnectorCache;
+import org.apache.seatunnel.app.bean.engine.EngineDataType;
 import org.apache.seatunnel.app.config.ConnectorDataSourceMapperConfig;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.TableSchemaReq;
@@ -92,7 +93,16 @@ public class TableSchemaServiceImpl extends SeatunnelBaseServiceImpl
         } else if (pluginName.startsWith("JDBC-")) {
             pluginName = pluginName.replace("JDBC-", "");
         }
-        DataTypeConvertor<?> convertor = factory.getDataTypeConvertor(pluginName);
+        // if the convertor is not exist in the plugin, will use the input type as the output type
+        DataTypeConvertor<?> convertor;
+        try {
+            convertor = factory.getDataTypeConvertor(pluginName);
+        } catch (Exception e) {
+            convertor = new EngineDataType.SeaTunnelDataTypeConvertor();
+            log.warn(
+                    "The convertor of plugin: {} is not exist, will use EngineDataType.SeaTunnelDataTypeConvertor",
+                    pluginName);
+        }
 
         for (TableField field : tableSchemaReq.getFields()) {
             SeaTunnelDataType<?> dataType = convertor.toSeaTunnelType(field.getType());
@@ -113,7 +123,16 @@ public class TableSchemaServiceImpl extends SeatunnelBaseServiceImpl
         } else if (pluginName.startsWith("JDBC-")) {
             pluginName = pluginName.replace("JDBC-", "");
         }
-        DataTypeConvertor<?> convertor = factory.getDataTypeConvertor(pluginName);
+        // if the convertor is not exist in the plugin, will use the input type as the output type
+        DataTypeConvertor<?> convertor;
+        try {
+            convertor = factory.getDataTypeConvertor(pluginName);
+        } catch (Exception e) {
+            convertor = new EngineDataType.SeaTunnelDataTypeConvertor();
+            log.warn(
+                    "The convertor of plugin: {} is not exist, will use EngineDataType.SeaTunnelDataTypeConvertor",
+                    pluginName);
+        }
         for (TableField field : tableFields) {
             try {
                 SeaTunnelDataType<?> dataType = convertor.toSeaTunnelType(field.getType());

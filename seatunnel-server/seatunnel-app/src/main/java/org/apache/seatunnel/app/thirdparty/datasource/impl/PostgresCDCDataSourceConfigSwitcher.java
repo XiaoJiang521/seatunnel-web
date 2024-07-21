@@ -21,7 +21,9 @@ import org.apache.seatunnel.shade.com.typesafe.config.Config;
 import org.apache.seatunnel.shade.com.typesafe.config.ConfigFactory;
 import org.apache.seatunnel.shade.com.typesafe.config.ConfigValueFactory;
 
+import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.RequiredOption;
 import org.apache.seatunnel.app.domain.request.connector.BusinessMode;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.SelectTableFields;
@@ -29,7 +31,10 @@ import org.apache.seatunnel.app.domain.response.datasource.VirtualTableDetailRes
 import org.apache.seatunnel.app.domain.response.datasource.VirtualTableFieldRes;
 import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.constants.PluginType;
+
+import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,15 +43,13 @@ import java.util.Locale;
 import static org.apache.seatunnel.app.domain.request.connector.BusinessMode.DATA_INTEGRATION;
 import static org.apache.seatunnel.app.domain.request.connector.BusinessMode.DATA_REPLICA;
 
+@AutoService(DataSourceConfigSwitcher.class)
 public class PostgresCDCDataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
 
     private int three = 3;
     private int two = 2;
 
-    private PostgresCDCDataSourceConfigSwitcher() {}
-
-    public static final PostgresCDCDataSourceConfigSwitcher INSTANCE =
-            new PostgresCDCDataSourceConfigSwitcher();
+    public PostgresCDCDataSourceConfigSwitcher() {}
 
     private static final String FACTORY = "factory";
 
@@ -65,6 +68,11 @@ public class PostgresCDCDataSourceConfigSwitcher extends AbstractDataSourceConfi
     private static final String SCHEMA = "schema";
 
     @Override
+    public String getDataSourceName() {
+        return "POSTGRES-CDC";
+    }
+
+    @Override
     public FormStructure filterOptionRule(
             String connectorName,
             OptionRule dataSourceOptionRule,
@@ -72,6 +80,8 @@ public class PostgresCDCDataSourceConfigSwitcher extends AbstractDataSourceConfi
             BusinessMode businessMode,
             PluginType pluginType,
             OptionRule connectorOptionRule,
+            List<RequiredOption> addRequiredOptions,
+            List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
         if (PluginType.SOURCE.equals(pluginType)) {
             excludedKeys.add(DATABASE_NAMES);
@@ -89,6 +99,8 @@ public class PostgresCDCDataSourceConfigSwitcher extends AbstractDataSourceConfi
                 businessMode,
                 pluginType,
                 connectorOptionRule,
+                addRequiredOptions,
+                addOptionalOptions,
                 excludedKeys);
     }
 

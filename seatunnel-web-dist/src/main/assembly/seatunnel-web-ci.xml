@@ -71,7 +71,7 @@
         </fileSet>
     </fileSets>
     <dependencySets>
-        <!-- =================== SeaTunnel App =========================  -->
+        <!-- =================== Third party dependency =========================  -->
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
@@ -117,7 +117,6 @@
                 <include>ch.qos.logback:logback-core:jar</include>
             </includes>
         </dependencySet>
-
         <!-- =================== SeaTunnel Datasource  ===================  -->
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>

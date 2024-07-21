@@ -20,28 +20,36 @@ package org.apache.seatunnel.app.thirdparty.datasource.impl;
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
 import org.apache.seatunnel.shade.com.typesafe.config.ConfigValueFactory;
 
+import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.RequiredOption;
 import org.apache.seatunnel.app.domain.request.connector.BusinessMode;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.SelectTableFields;
 import org.apache.seatunnel.app.domain.response.datasource.VirtualTableDetailRes;
 import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.constants.PluginType;
+
+import com.google.auto.service.AutoService;
 
 import java.util.Arrays;
 import java.util.List;
 
+@AutoService(DataSourceConfigSwitcher.class)
 public class StarRocksDataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
 
     private static final String TABLE = "table";
 
     private static final String DATABASE = "database";
 
-    private StarRocksDataSourceConfigSwitcher() {}
+    public StarRocksDataSourceConfigSwitcher() {}
 
-    public static final StarRocksDataSourceConfigSwitcher INSTANCE =
-            new StarRocksDataSourceConfigSwitcher();
+    @Override
+    public String getDataSourceName() {
+        return "STARROCKS";
+    }
 
     @Override
     public FormStructure filterOptionRule(
@@ -51,6 +59,8 @@ public class StarRocksDataSourceConfigSwitcher extends AbstractDataSourceConfigS
             BusinessMode businessMode,
             PluginType pluginType,
             OptionRule connectorOptionRule,
+            List<RequiredOption> addRequiredOptions,
+            List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
         if (PluginType.SOURCE.equals(pluginType)) {
             throw new UnsupportedOperationException("Unsupported PluginType: " + pluginType);
@@ -66,6 +76,8 @@ public class StarRocksDataSourceConfigSwitcher extends AbstractDataSourceConfigS
                 businessMode,
                 pluginType,
                 connectorOptionRule,
+                addRequiredOptions,
+                addOptionalOptions,
                 excludedKeys);
     }
 

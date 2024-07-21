@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 public class MysqlCDCDataSourceChannel implements DataSourceChannel {
@@ -65,8 +66,8 @@ public class MysqlCDCDataSourceChannel implements DataSourceChannel {
             String pluginName,
             Map<String, String> requestParams,
             String database,
-            Map<String, String> option) {
-        return this.getTableNames(requestParams, database);
+            Map<String, String> options) {
+        return this.getTableNames(requestParams, database, options);
     }
 
     @Override
@@ -154,13 +155,17 @@ public class MysqlCDCDataSourceChannel implements DataSourceChannel {
             throw new DataSourcePluginException("Jdbc url is null");
         }
         String url = requestParams.get(MysqlCDCOptionRule.BASE_URL.key());
+
+        Properties info = new java.util.Properties();
+        info.put("autoDeserialize", "false");
+        info.put("allowLoadLocalInfile", "false");
+        info.put("allowLoadLocalInfileInPath", "");
         if (null != requestParams.get(MysqlCDCOptionRule.PASSWORD.key())
                 && null != requestParams.get(MysqlCDCOptionRule.USERNAME.key())) {
-            String username = requestParams.get(MysqlCDCOptionRule.USERNAME.key());
-            String password = requestParams.get(MysqlCDCOptionRule.PASSWORD.key());
-            return DriverManager.getConnection(url, username, password);
+            info.put("user", requestParams.get(MysqlCDCOptionRule.USERNAME.key()));
+            info.put("password", requestParams.get(MysqlCDCOptionRule.PASSWORD.key()));
         }
-        return DriverManager.getConnection(url);
+        return DriverManager.getConnection(url, info);
     }
 
     protected List<String> getDataBaseNames(Map<String, String> requestParams) throws SQLException {
@@ -179,17 +184,29 @@ public class MysqlCDCDataSourceChannel implements DataSourceChannel {
         }
     }
 
-    protected List<String> getTableNames(Map<String, String> requestParams, String dbName) {
+    protected List<String> getTableNames(
+            Map<String, String> requestParams, String dbName, Map<String, String> options) {
         List<String> tableNames = new ArrayList<>();
+        String filterName = options.get("filterName");
+        String size = options.get("size");
+        boolean isSize = StringUtils.isNotEmpty(size);
+        if (StringUtils.isNotEmpty(filterName) && !filterName.contains("%")) {
+            filterName = "%" + filterName + "%";
+        } else if (StringUtils.equals(filterName, "")) {
+            filterName = null;
+        }
         try (Connection connection = init(requestParams);
                 ResultSet resultSet =
                         connection
                                 .getMetaData()
-                                .getTables(dbName, null, null, new String[] {"TABLE"})) {
+                                .getTables(dbName, null, filterName, new String[] {"TABLE"})) {
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
                 if (StringUtils.isNotBlank(tableName)) {
                     tableNames.add(tableName);
+                    if (isSize && tableNames.size() >= Integer.parseInt(size)) {
+                        break;
+                    }
                 }
             }
             return tableNames;

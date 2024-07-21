@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,17 +59,28 @@ public class MysqlJdbcDataSourceChannel implements DataSourceChannel {
             @NonNull String pluginName,
             Map<String, String> requestParams,
             String database,
-            Map<String, String> option) {
+            Map<String, String> options) {
         List<String> tableNames = new ArrayList<>();
+        String filterName = options.get("filterName");
+        String size = options.get("size");
+        boolean isSize = StringUtils.isNotEmpty(size);
+        if (StringUtils.isNotEmpty(filterName) && !filterName.contains("%")) {
+            filterName = "%" + filterName + "%";
+        } else if (StringUtils.equals(filterName, "")) {
+            filterName = null;
+        }
         try (Connection connection = getConnection(requestParams);
                 ResultSet resultSet =
                         connection
                                 .getMetaData()
-                                .getTables(database, null, null, new String[] {"TABLE"})) {
+                                .getTables(database, null, filterName, new String[] {"TABLE"})) {
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
                 if (StringUtils.isNotBlank(tableName)) {
                     tableNames.add(tableName);
+                    if (isSize && tableNames.size() >= Integer.parseInt(size)) {
+                        break;
+                    }
                 }
             }
             return tableNames;
@@ -176,11 +188,15 @@ public class MysqlJdbcDataSourceChannel implements DataSourceChannel {
         String url =
                 JdbcUtils.replaceDatabase(
                         requestParams.get(MysqlOptionRule.URL.key()), databaseName);
+
+        Properties info = new java.util.Properties();
+        info.put("autoDeserialize", "false");
+        info.put("allowLoadLocalInfile", "false");
+        info.put("allowLoadLocalInfileInPath", "");
         if (requestParams.containsKey(MysqlOptionRule.USER.key())) {
-            String username = requestParams.get(MysqlOptionRule.USER.key());
-            String password = requestParams.get(MysqlOptionRule.PASSWORD.key());
-            return DriverManager.getConnection(url, username, password);
+            info.put("user", requestParams.get(MysqlOptionRule.USER.key()));
+            info.put("password", requestParams.get(MysqlOptionRule.PASSWORD.key()));
         }
-        return DriverManager.getConnection(url);
+        return DriverManager.getConnection(url, info);
     }
 }

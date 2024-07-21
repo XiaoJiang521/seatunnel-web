@@ -57,8 +57,7 @@ public class DatasourceLoadConfig {
                 "JDBC-CLICKHOUSE",
                 "org.apache.seatunnel.datasource.plugin.clickhouse.jdbc.ClickhouseJdbcDataSourceFactory");
         classLoaderFactoryName.put(
-                "HIVE",
-                "org.apache.seatunnel.datasource.plugin.hive.jdbc.HiveJdbcDataSourceFactory");
+                "HIVE", "com.whaleops.datasource.datasource.plugin.hive.HiveDataSourceFactory");
         classLoaderFactoryName.put(
                 "JDBC-ORACLE",
                 "org.apache.seatunnel.datasource.plugin.oracle.jdbc.OracleJdbcDataSourceFactory");
@@ -93,6 +92,11 @@ public class DatasourceLoadConfig {
         classLoaderFactoryName.put(
                 "JDBC-STARROCKS",
                 "org.apache.seatunnel.datasource.plugin.starrocks.jdbc.StarRocksJdbcDataSourceFactory");
+        classLoaderFactoryName.put(
+                "MONGODB", "com.apache.seatunnel.datasource.plugin.mongodb.MongoDataSourceFactory");
+        classLoaderFactoryName.put(
+                "JDBC-DB2",
+                "org.apache.seatunnel.datasource.plugin.db2.jdbc.Db2JdbcDataSourceFactory");
 
         classLoaderJarName.put("JDBC-ORACLE", "datasource-jdbc-oracle-");
         classLoaderJarName.put("JDBC-CLICKHOUSE", "datasource-jdbc-clickhouse-");
@@ -107,11 +111,13 @@ public class DatasourceLoadConfig {
 
         classLoaderJarName.put("ELASTICSEARCH", "datasource-elasticsearch-");
         classLoaderJarName.put("S3", "datasource-s3-");
-        classLoaderJarName.put("HIVE", "datasource-jdbc-hive-");
+        classLoaderJarName.put("HIVE", "datasource-hive-");
         classLoaderJarName.put("KAFKA", "datasource-kafka-");
         classLoaderJarName.put("STARROCKS", "datasource-starrocks-");
         classLoaderJarName.put("S3-REDSHIFT", "datasource-s3redshift-");
         classLoaderJarName.put("JDBC-STARROCKS", "datasource-jdbc-starrocks-");
+        classLoaderJarName.put("MONGODB", "datasource-mongodb-");
+        classLoaderJarName.put("JDBC-DB2", "datasource-jdbc-db2-");
     }
 
     public static final Set<String> pluginSet =
@@ -122,16 +128,15 @@ public class DatasourceLoadConfig {
                     "Hive",
                     "JDBC-Oracle",
                     "JDBC-Postgres",
-                    "JDBC-Redshift",
                     "JDBC-SQLServer",
                     "JDBC-TiDB",
                     "Kafka",
                     "MySQL-CDC",
                     "S3",
-                    "S3-Redshift",
                     "SqlServer-CDC",
-                    "JDBC-StarRocks",
-                    "StarRocks");
+                    "StarRocks",
+                    "MongoDB",
+                    "JDBC-Db2");
 
     public static Map<String, DatasourceClassLoader> datasourceClassLoaders = new HashMap<>();
 

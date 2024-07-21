@@ -25,7 +25,7 @@
     <artifactId>datasource-kafka</artifactId>
 
     <properties>
-        <kafka.client.version>3.2.0</kafka.client.version>
+        <kafka.client.version>3.4.0</kafka.client.version>
     </properties>
 
     <dependencies>
@@ -61,4 +61,23 @@
             <version>${kafka.client.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <skip>${e2e.dependency.skip}</skip>
+                    <appendOutput>true</appendOutput>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

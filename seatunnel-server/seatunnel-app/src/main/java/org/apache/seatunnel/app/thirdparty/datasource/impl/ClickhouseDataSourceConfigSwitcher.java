@@ -20,25 +20,28 @@ package org.apache.seatunnel.app.thirdparty.datasource.impl;
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
 import org.apache.seatunnel.shade.com.typesafe.config.ConfigValueFactory;
 
+import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.RequiredOption;
 import org.apache.seatunnel.app.domain.request.connector.BusinessMode;
 import org.apache.seatunnel.app.domain.request.job.DataSourceOption;
 import org.apache.seatunnel.app.domain.request.job.SelectTableFields;
 import org.apache.seatunnel.app.domain.response.datasource.VirtualTableDetailRes;
 import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
+import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.app.utils.JdbcUtils;
 import org.apache.seatunnel.common.constants.PluginType;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
 
+@AutoService(DataSourceConfigSwitcher.class)
 public class ClickhouseDataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
-    private static final ClickhouseDataSourceConfigSwitcher INSTANCE =
-            new ClickhouseDataSourceConfigSwitcher();
 
     private static final String HOST = "host";
     private static final String URL = "url";
@@ -53,6 +56,11 @@ public class ClickhouseDataSourceConfigSwitcher extends AbstractDataSourceConfig
                     .build();
 
     @Override
+    public String getDataSourceName() {
+        return "JDBC-CLICKHOUSE";
+    }
+
+    @Override
     public FormStructure filterOptionRule(
             String connectorName,
             OptionRule dataSourceOptionRule,
@@ -60,6 +68,8 @@ public class ClickhouseDataSourceConfigSwitcher extends AbstractDataSourceConfig
             BusinessMode businessMode,
             PluginType pluginType,
             OptionRule connectorOptionRule,
+            List<RequiredOption> addRequiredOptions,
+            List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
         return super.filterOptionRule(
                 connectorName,
@@ -68,6 +78,8 @@ public class ClickhouseDataSourceConfigSwitcher extends AbstractDataSourceConfig
                 businessMode,
                 pluginType,
                 connectorOptionRule,
+                addRequiredOptions,
+                addOptionalOptions,
                 FILTER_FIELD_MAP.get(pluginType));
     }
 
@@ -143,9 +155,5 @@ public class ClickhouseDataSourceConfigSwitcher extends AbstractDataSourceConfig
                 connectorConfig);
     }
 
-    public static ClickhouseDataSourceConfigSwitcher getInstance() {
-        return INSTANCE;
-    }
-
-    private ClickhouseDataSourceConfigSwitcher() {}
+    public ClickhouseDataSourceConfigSwitcher() {}
 }
